@@ -1,6 +1,5 @@
 package gui;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -12,6 +11,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
@@ -29,22 +29,26 @@ public class MainViewController implements Initializable {
 	private MenuItem menuItemAbout;
 
 	@FXML
+	private Button btAviso;
+
 	public void onMenuItemSellerAction() {
-		System.out.println("menuItemSeller");
+		System.out.println("onMenuItemSellerAction");
 	}
 
-	@FXML
 	public void onMenuItemDepartmentAction() {
 		loadView2("/gui/DepartmentList.fxml");
 	}
-	
-	@FXML
+
 	public void onMenuItemAboutAction() {
-		loadView("/gui/about.fxml");
+		loadView("/gui/About.fxml");
+	}
+
+	public void onAvisoAction() {
+		Alerts.showAlert("Aviso", null, "O Senhor é a minha força", AlertType.INFORMATION);
 	}
 
 	@Override
-	public void initialize(URL uri, ResourceBundle rb) {
+	public void initialize(URL url, ResourceBundle rb) {
 
 	}
 
@@ -55,19 +59,21 @@ public class MainViewController implements Initializable {
 			VBox newVbox = loader.load();
 
 			Scene mainScene = Main.getMainScene();
-			VBox mainVbox = (VBox) ((ScrollPane) mainScene.getRoot()).getContent();
+			VBox mainVBox = (VBox) ((ScrollPane) mainScene.getRoot()).getContent();
+			
+			Node mainMenu = mainVBox.getChildren().get(0);
+			Node mainButtonBar = mainVBox.getChildren().get(1);
+			
+			mainVBox.getChildren().clear();
+			
+			mainVBox.getChildren().add(mainMenu);
+			mainVBox.getChildren().add(mainButtonBar);
+			mainVBox.getChildren().addAll(newVbox.getChildren());
 
-			Node mainMenu = mainVbox.getChildren().get(0);
-			mainVbox.getChildren().clear();
-			mainVbox.getChildren().add(mainMenu);
-			mainVbox.getChildren().addAll(newVbox.getChildren());
-		}
-		catch (IOException e) {
-			Alerts.showAlert("IOException", "Error load view", e.getMessage(), AlertType.ERROR);
-
+		} catch (Exception e) {
+			Alerts.showAlert("Error", null, e.getMessage(), AlertType.ERROR);
 		}
 	}
-	
 	
 	private void loadView2(String absoluteName) {
 
@@ -76,20 +82,23 @@ public class MainViewController implements Initializable {
 			VBox newVbox = loader.load();
 
 			Scene mainScene = Main.getMainScene();
-			VBox mainVbox = (VBox) ((ScrollPane) mainScene.getRoot()).getContent();
-
-			Node mainMenu = mainVbox.getChildren().get(0);
-			mainVbox.getChildren().clear();
-			mainVbox.getChildren().add(mainMenu);
-			mainVbox.getChildren().addAll(newVbox.getChildren());
+			VBox mainVBox = (VBox) ((ScrollPane) mainScene.getRoot()).getContent();
+			
+			Node mainMenu = mainVBox.getChildren().get(0);
+			Node mainButtonBar = mainVBox.getChildren().get(1);
+			
+			mainVBox.getChildren().clear();
+			
+			mainVBox.getChildren().add(mainMenu);
+			mainVBox.getChildren().add(mainButtonBar);
+			mainVBox.getChildren().addAll(newVbox.getChildren());
 			
 			DepartmentListController controller = loader.getController();
-			controller.setDepartmentService(new DepartmentService());
-			controller.UpdateTableView();
-		}
-		catch (IOException e) {
-			Alerts.showAlert("IOException", "Error load view", e.getMessage(), AlertType.ERROR);
+			controller.setService(new DepartmentService());
+			controller.updateTableView();
 
+		} catch (Exception e) {
+			Alerts.showAlert("Error", null, e.getMessage(), AlertType.ERROR);
 		}
 	}
 

@@ -22,7 +22,7 @@ public class DepartmentListController implements Initializable {
 	private DepartmentService service;
 
 	@FXML
-	private TableView<Department> tableViewDepartment;
+	private TableView<Department> tableViewDepartments;
 
 	@FXML
 	private TableColumn<Department, Integer> tableColumnId;
@@ -31,39 +31,44 @@ public class DepartmentListController implements Initializable {
 	private TableColumn<Department, String> tableColumnName;
 
 	@FXML
-	private Button btNew;
+	private Button btNewDepartment;
 
 	private ObservableList<Department> obsList;
 
-	public void onBtNewAction() {
-		System.out.println("onBtNewAction");
+	@FXML
+	public void btNewAction() {
+		System.out.println("btNewAction");
 	}
 
-	public void setDepartmentService(DepartmentService service) {
+	public void setService(DepartmentService service) {
 		this.service = service;
 	}
 
 	@Override
-	public void initialize(URL url, ResourceBundle lb) {
+	public void initialize(URL url, ResourceBundle tb) {
+
 		initializeNodes();
+
 	}
 
 	private void initializeNodes() {
+
 		tableColumnId.setCellValueFactory(new PropertyValueFactory<>("id"));
 		tableColumnName.setCellValueFactory(new PropertyValueFactory<>("name"));
 
 		Stage stage = (Stage) Main.getMainScene().getWindow();
-		tableViewDepartment.prefHeightProperty().bind(stage.heightProperty());
+
+		tableViewDepartments.prefHeightProperty().bind(stage.heightProperty());
+
 	}
 
-	public void UpdateTableView() {
+	public void updateTableView() {
 		if (service == null) {
-			throw new IllegalStateException("Service was null");
+			throw new IllegalStateException("Service wass null");
 		}
-
 		List<Department> list = service.findAll();
 		obsList = FXCollections.observableArrayList(list);
-		tableViewDepartment.setItems(obsList);
+		tableViewDepartments.setItems(obsList);
 	}
 
 }
