@@ -2,6 +2,7 @@ package gui;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 import application.Main;
 import gui.util.Alerts;
@@ -36,11 +37,15 @@ public class MainViewController implements Initializable {
 	}
 
 	public void onMenuItemDepartmentAction() {
-		loadView2("/gui/DepartmentList.fxml");
+		loadView("/gui/DepartmentList.fxml", (DepartmentListController controller) -> {
+			controller.setService(new DepartmentService());
+			controller.updateTableView();
+		});
 	}
 
 	public void onMenuItemAboutAction() {
-		loadView("/gui/About.fxml");
+		loadView("/gui/About.fxml", x -> {
+		});
 	}
 
 	public void onAvisoAction() {
@@ -52,7 +57,7 @@ public class MainViewController implements Initializable {
 
 	}
 
-	private void loadView(String absoluteName) {
+	private synchronized <T> void loadView(String absoluteName, Consumer<T> initializeAction) {
 
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
@@ -60,42 +65,18 @@ public class MainViewController implements Initializable {
 
 			Scene mainScene = Main.getMainScene();
 			VBox mainVBox = (VBox) ((ScrollPane) mainScene.getRoot()).getContent();
-			
+
 			Node mainMenu = mainVBox.getChildren().get(0);
 			Node mainButtonBar = mainVBox.getChildren().get(1);
-			
+
 			mainVBox.getChildren().clear();
-			
+
 			mainVBox.getChildren().add(mainMenu);
 			mainVBox.getChildren().add(mainButtonBar);
 			mainVBox.getChildren().addAll(newVbox.getChildren());
 
-		} catch (Exception e) {
-			Alerts.showAlert("Error", null, e.getMessage(), AlertType.ERROR);
-		}
-	}
-	
-	private void loadView2(String absoluteName) {
-
-		try {
-			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
-			VBox newVbox = loader.load();
-
-			Scene mainScene = Main.getMainScene();
-			VBox mainVBox = (VBox) ((ScrollPane) mainScene.getRoot()).getContent();
-			
-			Node mainMenu = mainVBox.getChildren().get(0);
-			Node mainButtonBar = mainVBox.getChildren().get(1);
-			
-			mainVBox.getChildren().clear();
-			
-			mainVBox.getChildren().add(mainMenu);
-			mainVBox.getChildren().add(mainButtonBar);
-			mainVBox.getChildren().addAll(newVbox.getChildren());
-			
-			DepartmentListController controller = loader.getController();
-			controller.setService(new DepartmentService());
-			controller.updateTableView();
+			T controller = loader.getController();
+			initializeAction.accept(controller);
 
 		} catch (Exception e) {
 			Alerts.showAlert("Error", null, e.getMessage(), AlertType.ERROR);
